@@ -1,86 +1,46 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"strings"
 
+	Search "github.com/JasonHKL/spy-search/search"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 var SERPER_API string
+var DB *sql.DB
+
+/*
+Refactor all these
+*/
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "admin"
+	password = "postgres"
+	dbname   = "spysearch"
+)
 
 type Message struct {
 	Query string `json:"query"`
 }
 
-type SearchResult struct {
-	SearchParameters struct {
-		Q      string `json:"q"`
-		Type   string `json:"type"`
-		Engine string `json:"engine"`
-	} `json:"searchParameters"`
-
-	AnswerBox struct {
-		Title  string `json:"title"`
-		Answer string `json:"answer"`
-	} `json:"answerBox"`
-
-	KnowledgeGraph struct {
-		Title             string `json:"title"`
-		Type              string `json:"type"`
-		Website           string `json:"website"`
-		ImageURL          string `json:"imageUrl"`
-		Description       string `json:"description"`
-		DescriptionSource string `json:"descriptionSource"`
-		DescriptionLink   string `json:"descriptionLink"`
-		Attributes        struct {
-			CustomerService string `json:"Customer service"`
-			Founders        string `json:"Founders"`
-			Founded         string `json:"Founded"`
-			Headquarters    string `json:"Headquarters"`
-			CEO             string `json:"CEO"`
-		} `json:"attributes"`
-	} `json:"knowledgeGraph"`
-
-	Organic []struct {
-		Title     string `json:"title"`
-		Link      string `json:"link"`
-		Snippet   string `json:"snippet"`
-		Sitelinks []struct {
-			Title string `json:"title"`
-			Link  string `json:"link"`
-		} `json:"sitelinks,omitempty"`
-		Date     string `json:"date,omitempty"`
-		Position int    `json:"position"`
-	} `json:"organic"`
-
-	PeopleAlsoAsk []struct {
-		Question string `json:"question"`
-		Snippet  string `json:"snippet"`
-		Title    string `json:"title"`
-		Link     string `json:"link"`
-	} `json:"peopleAlsoAsk"`
-
-	RelatedSearches []struct {
-		Query string `json:"query"`
-	} `json:"relatedSearches"`
-
-	Credits int `json:"credits"`
-}
-
 type Result struct {
-	Url     string `json:"url"`
-	Snippet string `json:"snippet"`
-	Content string `json:"content"`
-	Summary string `json:"summary"`
+	Url     string              `json:"url"`
+	Search  Search.SearchResult `json:"content"`
+	Summary string              `json:"summary"`
 }
 
-func GetSearchResult(q string) (*SearchResult, error) {
+func GetSearchResult(q string) (*Search.SearchResult, error) {
 
 	url := "https://google.serper.dev/search"
 	method := "POST"
@@ -112,7 +72,7 @@ func GetSearchResult(q string) (*SearchResult, error) {
 		return nil, err
 	}
 
-	var result SearchResult
+	var result Search.SearchResult
 
 	err = json.Unmarshal(body, &result)
 	if err != nil {
@@ -123,7 +83,15 @@ func GetSearchResult(q string) (*SearchResult, error) {
 	return &result, nil
 }
 
-func AddSearchResult() {}
+// Connect with PSQL
+func PsqlConnection() {}
+
+/*
+Add result to the database
+*/
+func AddSearchResult() {
+
+}
 
 /*
 The shearch function
@@ -157,15 +125,39 @@ func SearchContent(c *gin.Context) {
 	}()
 }
 
-// initial set up , API & DB
+// summarize
+func GetWebContent(url string) {}
 
+// initial set up , API & DB
 func Health(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status": true,
 	})
 }
 
+func LoadDb() {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	DB, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer DB.Close()
+
+	err = DB.Ping()
+	if err != nil {
+		panic(err)
+	}
+	slog.Info("Connect Successful")
+}
+
+func CloseDB() {
+	DB.Close()
+}
+
 func main() {
+	LoadDb()
 	err := godotenv.Load()
 	if err != nil {
 		panic("reading API key fail")
@@ -176,4 +168,6 @@ func main() {
 	router.GET("/health", Health)
 	router.POST("/ping", SearchContent)
 	router.Run()
+
+	CloseDB()
 }
