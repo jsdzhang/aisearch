@@ -2,8 +2,7 @@
 
 **Spy Search** is an agentic search framework designed to outperform current web search agents with a focus on faster, more efficient daily usage.
 
-While commercial solutions like Manus charge $200 per month, Spy Search leverages open-source models to provide a cost-effective alternative without sacrificing performance.
-Currently our searching-speed is quite slow yet we can generate a long length consistent report (around 2000 words) with latest current information! This problem will be tackle after the release of v1.0. 
+Spy search currently provide very quick searching speed. We strongly believe our faremwork will become one of the best you have ever used ! 
 
 ##### [簡體中文](./docs/ch_simplify.md) 
 ##### [繁體中文](./docs/ch_complex.md)
@@ -11,7 +10,11 @@ Currently our searching-speed is quite slow yet we can generate a long length co
 ---
 
 ## Roadmap
-**News**: 2025-06-10 Spy-searcher has just released v0.3 ! 
+**News**: 
+2025-06-16 Spy-search has just updated to v0.3.1
+2025-06-10 Spy-search has just released v0.3 ! 
+
+*Note*: Our update pace will temporarily slow as we transition to a microservices architecture. This refactored version will be labeled as v0.4.
 
 ---
 
