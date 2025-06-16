@@ -49,7 +49,7 @@ config the config.json file, you may copy the following template
 After that run (due to some problem some computers espically using ollama may have some issue) If you are a developer we strongly suggest you follow the guide from contributing .md which is much more convience. 
 ```shell
 docker build -t spy-searcher .   
-docker run -p 8000:8000 -p 8080:8080 spy-searcher
+docker run -p 8000:8000 -p 8080:8080 -e OLLAMA_HOST=host.docker.internal spy-searcher
 ```
 
 Now you can access  
