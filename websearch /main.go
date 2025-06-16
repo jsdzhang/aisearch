@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io"
 	"log/slog"
 	"net/http"
@@ -17,6 +18,61 @@ type Message struct {
 	Query string `json:"query"`
 }
 
+type SearchResult struct {
+	SearchParameters struct {
+		Q      string `json:"q"`
+		Type   string `json:"type"`
+		Engine string `json:"engine"`
+	} `json:"searchParameters"`
+
+	AnswerBox struct {
+		Title  string `json:"title"`
+		Answer string `json:"answer"`
+	} `json:"answerBox"`
+
+	KnowledgeGraph struct {
+		Title             string `json:"title"`
+		Type              string `json:"type"`
+		Website           string `json:"website"`
+		ImageURL          string `json:"imageUrl"`
+		Description       string `json:"description"`
+		DescriptionSource string `json:"descriptionSource"`
+		DescriptionLink   string `json:"descriptionLink"`
+		Attributes        struct {
+			CustomerService string `json:"Customer service"`
+			Founders        string `json:"Founders"`
+			Founded         string `json:"Founded"`
+			Headquarters    string `json:"Headquarters"`
+			CEO             string `json:"CEO"`
+		} `json:"attributes"`
+	} `json:"knowledgeGraph"`
+
+	Organic []struct {
+		Title     string `json:"title"`
+		Link      string `json:"link"`
+		Snippet   string `json:"snippet"`
+		Sitelinks []struct {
+			Title string `json:"title"`
+			Link  string `json:"link"`
+		} `json:"sitelinks,omitempty"`
+		Date     string `json:"date,omitempty"`
+		Position int    `json:"position"`
+	} `json:"organic"`
+
+	PeopleAlsoAsk []struct {
+		Question string `json:"question"`
+		Snippet  string `json:"snippet"`
+		Title    string `json:"title"`
+		Link     string `json:"link"`
+	} `json:"peopleAlsoAsk"`
+
+	RelatedSearches []struct {
+		Query string `json:"query"`
+	} `json:"relatedSearches"`
+
+	Credits int `json:"credits"`
+}
+
 type Result struct {
 	Url     string `json:"url"`
 	Snippet string `json:"snippet"`
@@ -24,10 +80,11 @@ type Result struct {
 	Summary string `json:"summary"`
 }
 
-func GetSearchResult(q string) (string, error) {
+func GetSearchResult(q string) (*SearchResult, error) {
 
 	url := "https://google.serper.dev/search"
 	method := "POST"
+
 	playload := strings.NewReader(`{"q":"` + q + `"}`)
 
 	client := &http.Client{}
@@ -35,7 +92,7 @@ func GetSearchResult(q string) (string, error) {
 
 	if err != nil {
 		slog.Error(err.Error())
-		return "", err
+		return nil, err
 	}
 
 	req.Header.Add("X-API-KEY", SERPER_API)
@@ -44,7 +101,7 @@ func GetSearchResult(q string) (string, error) {
 	res, err := client.Do(req)
 	if err != nil {
 		slog.Error(err.Error())
-		return "", err
+		return nil, err
 	}
 
 	defer res.Body.Close()
@@ -52,10 +109,18 @@ func GetSearchResult(q string) (string, error) {
 
 	if err != nil {
 		slog.Error(err.Error())
-		return "", err
+		return nil, err
 	}
 
-	return string(body), nil
+	var result SearchResult
+
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		slog.Error(err.Error())
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 func AddSearchResult() {}
