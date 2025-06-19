@@ -5,7 +5,7 @@
 Spy search currently provide very quick searching speed. We strongly believe our faremwork will become one of the best you have ever used ! 
 
 A quick search spy search is just deployed (beta version) feel free to use it ! 
-(spy-search web version)[https://spysearch.org/]
+[spy-search web version](https://spysearch.org/)
 
 ##### [簡體中文](./docs/ch_simplify.md) 
 ##### [繁體中文](./docs/ch_complex.md)
