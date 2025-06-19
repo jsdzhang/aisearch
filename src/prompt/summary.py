@@ -34,7 +34,8 @@ def summary_prompt(content: str, db: list[str]) -> str:
 
       
       4. **Craft a Distilling Short Summary (`brief_summary`):**
-         - Write a 1–3 sentence `brief_summary` that captures the core new insight introduced in this content.
+         - The `brief_summary` should be based on your `full_summary` and capture the core new insight introduced in this content.
+         - Length: 1–3 concise sentences.
          - It must act as a unique fingerprint, clearly differentiating this entry from all prior summaries.
          - If you read this `brief_summary` later, it should immediately remind you what was uniquely added.
          - This summary will be stored for future reference, so it must be both clear and specific.
