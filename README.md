@@ -2,7 +2,7 @@
 
 **Spy Search** is an agentic search framework designed to outperform current web search agents with a focus on faster, more efficient daily usage.
 
-Spy search currently provide very quick searching speed. We strongly believe our faremwork will become one of the best you have ever used ! 
+Spy search currently provide very quick searching speed. We strongly believe our framework will become one of the best you have ever used ! 
 
 A quick search spy search is just deployed (beta version) feel free to use it ! 
 [spy-search web version](https://spysearch.org/)
